@@ -1,3 +1,2 @@
-# Mi proyecto final
-- Amigo 1
-- Amigo 2
+# Simplex Java
+Ing. Noé Vásquez Godínez
