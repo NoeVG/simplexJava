@@ -5,6 +5,7 @@
 package noevg.github.io.simplex;
 
 import noevg.github.io.simplex.gui.SimplexGUI;
+import org.opencv.core.Core;
 
 /**
  *
@@ -15,6 +16,8 @@ public class Simplex {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        System.load("/home/ziusudra/Downloads/opencv-4.5.4/build/lib/libopencv_java454.so");
+        //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.

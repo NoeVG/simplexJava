@@ -4,6 +4,10 @@
  */
 package noevg.github.io.simplex.gui;
 
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import noevg.github.io.simplex.computerVision.ComputerVision;
+
 /**
  *
  * @author ziusudra
@@ -30,6 +34,7 @@ public class SimplexGUI extends javax.swing.JFrame {
         panelModel = new javax.swing.JPanel();
         labelTitleModel = new javax.swing.JLabel();
         scrollModel = new javax.swing.JScrollPane();
+        imagen = new javax.swing.JLabel();
         panelButtonModel = new javax.swing.JPanel();
         captureModel = new javax.swing.JButton();
         loadModel = new javax.swing.JButton();
@@ -64,6 +69,8 @@ public class SimplexGUI extends javax.swing.JFrame {
         panelModel.add(labelTitleModel, java.awt.BorderLayout.NORTH);
 
         scrollModel.setMaximumSize(new java.awt.Dimension(250, 250));
+        scrollModel.setViewportView(imagen);
+
         panelModel.add(scrollModel, java.awt.BorderLayout.CENTER);
 
         panelButtonModel.setBackground(new java.awt.Color(254, 254, 254));
@@ -72,6 +79,11 @@ public class SimplexGUI extends javax.swing.JFrame {
         captureModel.setForeground(new java.awt.Color(254, 254, 254));
         captureModel.setText("Capture Model");
         captureModel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        captureModel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                captureModelMouseClicked(evt);
+            }
+        });
         panelButtonModel.add(captureModel);
 
         loadModel.setBackground(new java.awt.Color(1, 1, 1));
@@ -141,6 +153,17 @@ public class SimplexGUI extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void captureModelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_captureModelMouseClicked
+        ComputerVision computerVision = new ComputerVision();
+        //computerVision.captureModel();
+        
+        //this.imagen.setText("reload");
+        //this.imagen.add(new ImageIcon( computerVision.captureModel() ));
+        this.imagen.setIcon( new ImageIcon( computerVision.captureModel() ) );
+        revalidate();
+        repaint();
+    }//GEN-LAST:event_captureModelMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -180,6 +203,7 @@ public class SimplexGUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonSolver;
     private javax.swing.JButton captureModel;
+    private javax.swing.JLabel imagen;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
