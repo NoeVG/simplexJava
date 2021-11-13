@@ -8,6 +8,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import noevg.github.io.simplex.computerVision.ComputerVision;
 
@@ -105,6 +106,11 @@ public class SimplexGUI extends javax.swing.JFrame {
         loadModel.setForeground(new java.awt.Color(254, 254, 254));
         loadModel.setText("Load Model");
         loadModel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        loadModel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                loadModelMouseClicked(evt);
+            }
+        });
         jPanel1.add(loadModel);
 
         panelButtonModel.add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -176,16 +182,28 @@ public class SimplexGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void captureModelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_captureModelMouseClicked
-        //ComputerVision computerVision = new ComputerVision();
-        
-        //this.imagen.setIcon( new ImageIcon( computerVision.captureModel() ) );
-        
-        //computerVision.start();
-        
-        
         latch = new CountDownLatch(1);
         executor = Executors.newFixedThreadPool(1);
         computerVision = new ComputerVision(latch);
+        computerVision.setOriginModel(ComputerVision.GET_FROM_CAM);
+        loadModel();
+     
+    }//GEN-LAST:event_captureModelMouseClicked
+
+    private void loadModelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loadModelMouseClicked
+        latch = new CountDownLatch(1);
+        executor = Executors.newFixedThreadPool(1);
+        computerVision = new ComputerVision(latch);
+        computerVision.setOriginModel(ComputerVision.GET_FROM_FILE);     
+        JFileChooser fileChooser = new JFileChooser();
+        int seleccion = fileChooser.showOpenDialog(this);
+        if (seleccion == JFileChooser.APPROVE_OPTION){
+            computerVision.setPathFileModel(fileChooser.getSelectedFile().getPath());
+            loadModel();
+        }
+    }//GEN-LAST:event_loadModelMouseClicked
+    
+    private void loadModel(){
         executor.submit( computerVision );
         
         progressBarProcesingModel.setValue(10);
@@ -204,8 +222,7 @@ public class SimplexGUI extends javax.swing.JFrame {
 
         revalidate();
         repaint();
-    }//GEN-LAST:event_captureModelMouseClicked
-
+    }
     
     
     

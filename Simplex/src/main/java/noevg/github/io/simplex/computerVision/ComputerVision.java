@@ -21,7 +21,15 @@ import org.opencv.imgproc.Imgproc;
  * @author ziusudra
  */
 public class ComputerVision implements Runnable  {
+    public static final boolean GET_FROM_CAM = true;
+    public static final boolean GET_FROM_FILE = false;
+
+    
     private CountDownLatch latch;
+    private boolean getImageFrom;
+    
+    private String pathFileImage;
+    
     Webcam webcam;
     Mat frameModel;
     
@@ -34,6 +42,14 @@ public class ComputerVision implements Runnable  {
     public void run(){
         captureModel();
         latch.countDown();
+    }
+    
+    public void setOriginModel(boolean selectOrigin){
+        this.getImageFrom = selectOrigin;
+    }
+    
+    public void setPathFileModel(String path){
+        this.pathFileImage = path;
     }
     
     /**
@@ -53,18 +69,9 @@ public class ComputerVision implements Runnable  {
     
     private void procesingFrame(){    
         Mat frame = new Mat();
+
         Imgproc.cvtColor(this.frameModel, frame, Imgproc.COLOR_BGR2GRAY);
         this.frameModel = frame;
-        
-        //Imgproc.equalizeHist( this.frameModel, frame );
-        //this.frameModel = frame;
-        
-        //Imgproc.blur(this.frameModel, frame, new Size(1, 1), new Point(-1, -1));
-        //this.frameModel = frame;
-        
-        //Imgproc.GaussianBlur(this.frameModel, frame, new Size(3, 3), 0, 0);
-        //this.frameModel = frame;
-
         
         Imgproc.equalizeHist( this.frameModel, frame );
         this.frameModel = frame;
@@ -72,15 +79,10 @@ public class ComputerVision implements Runnable  {
         Imgproc.GaussianBlur(this.frameModel, frame, new Size(1, 1), 0, 0);
         this.frameModel = frame;
 
-
-
-        /*
-        Mat element = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(3, 1),
-        new Point(3, 1));
-        */
         
         Imgproc.threshold(this.frameModel, frame, 125, 255, 0);    
         this.frameModel = frame;
+        
         /*
         int kernelSize = 3;        
         Mat element = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(2 * kernelSize + 1, 2 * kernelSize + 1),
@@ -88,10 +90,7 @@ public class ComputerVision implements Runnable  {
 
         Imgproc.erode(this.frameModel, frame, element);
         this.frameModel = frame;
-        */
-        
-        //Imgproc.equalizeHist( this.frameModel, frame );
-        //this.frameModel = frame;
+        */        
         /*
         Imgproc.Canny(this.frameModel, frame, 0, 0 * 3, 3, false);
         this.frameModel = frame;
@@ -124,13 +123,13 @@ public class ComputerVision implements Runnable  {
      * @return BufferedImage to display in the GUI Interface
      */
     private void captureModel(){
-        
-        //this.frameModel = Imgcodecs.imread("/home/ziusudra/Desktop/modelo.jpeg");
-        //procesingFrame();
         try{
-            webcam.open();
-            this.frameModel = bufferedImageToMat(webcam.getImage());
-        
+            if(this.getImageFrom == GET_FROM_CAM){
+                webcam.open();
+                this.frameModel = bufferedImageToMat(webcam.getImage());        
+            }else if(this.getImageFrom == GET_FROM_FILE){
+                this.frameModel = Imgcodecs.imread(this.pathFileImage);
+            }
         }catch(Exception e){
             this.frameModel = Imgcodecs.imread("/home/ziusudra/Desktop/modelo.jpeg");
         }
