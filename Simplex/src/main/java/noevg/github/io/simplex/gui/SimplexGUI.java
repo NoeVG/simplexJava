@@ -4,6 +4,9 @@
  */
 package noevg.github.io.simplex.gui;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import noevg.github.io.simplex.computerVision.ComputerVision;
@@ -19,6 +22,10 @@ public class SimplexGUI extends javax.swing.JFrame {
      */
     public SimplexGUI() {
         initComponents();
+        
+        
+        //computerVision = new ComputerVision();
+        
     }
 
     /**
@@ -33,11 +40,13 @@ public class SimplexGUI extends javax.swing.JFrame {
         mainPanel = new javax.swing.JPanel();
         panelModel = new javax.swing.JPanel();
         labelTitleModel = new javax.swing.JLabel();
-        scrollModel = new javax.swing.JScrollPane();
+        panelImage = new javax.swing.JPanel();
         imagen = new javax.swing.JLabel();
         panelButtonModel = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
         captureModel = new javax.swing.JButton();
         loadModel = new javax.swing.JButton();
+        progressBarProcesingModel = new javax.swing.JProgressBar();
         panelSolver = new javax.swing.JPanel();
         buttonSolver = new javax.swing.JButton();
         panelMessage = new javax.swing.JPanel();
@@ -54,11 +63,11 @@ public class SimplexGUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(500, 700));
-        setPreferredSize(new java.awt.Dimension(500, 500));
+        setPreferredSize(new java.awt.Dimension(700, 700));
         setSize(new java.awt.Dimension(500, 500));
 
         mainPanel.setBackground(new java.awt.Color(254, 254, 254));
-        mainPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder("Simplex Solver")));
+        mainPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
         mainPanel.setLayout(new java.awt.BorderLayout());
 
         panelModel.setBackground(new java.awt.Color(254, 254, 254));
@@ -68,12 +77,18 @@ public class SimplexGUI extends javax.swing.JFrame {
         labelTitleModel.setText("Mathematical Model ");
         panelModel.add(labelTitleModel, java.awt.BorderLayout.NORTH);
 
-        scrollModel.setMaximumSize(new java.awt.Dimension(250, 250));
-        scrollModel.setViewportView(imagen);
+        panelImage.setBackground(new java.awt.Color(254, 254, 254));
+        panelImage.setLayout(new java.awt.BorderLayout());
 
-        panelModel.add(scrollModel, java.awt.BorderLayout.CENTER);
+        imagen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        imagen.setAlignmentX(0.5F);
+        panelImage.add(imagen, java.awt.BorderLayout.CENTER);
+
+        panelModel.add(panelImage, java.awt.BorderLayout.CENTER);
 
         panelButtonModel.setBackground(new java.awt.Color(254, 254, 254));
+        panelButtonModel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panelButtonModel.setLayout(new java.awt.BorderLayout());
 
         captureModel.setBackground(new java.awt.Color(1, 1, 1));
         captureModel.setForeground(new java.awt.Color(254, 254, 254));
@@ -84,15 +99,21 @@ public class SimplexGUI extends javax.swing.JFrame {
                 captureModelMouseClicked(evt);
             }
         });
-        panelButtonModel.add(captureModel);
+        jPanel1.add(captureModel);
 
         loadModel.setBackground(new java.awt.Color(1, 1, 1));
         loadModel.setForeground(new java.awt.Color(254, 254, 254));
         loadModel.setText("Load Model");
         loadModel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 15, 10, 15));
-        panelButtonModel.add(loadModel);
+        jPanel1.add(loadModel);
 
-        panelModel.add(panelButtonModel, java.awt.BorderLayout.PAGE_END);
+        panelButtonModel.add(jPanel1, java.awt.BorderLayout.CENTER);
+
+        progressBarProcesingModel.setBackground(new java.awt.Color(254, 254, 254));
+        progressBarProcesingModel.setStringPainted(true);
+        panelButtonModel.add(progressBarProcesingModel, java.awt.BorderLayout.SOUTH);
+
+        panelModel.add(panelButtonModel, java.awt.BorderLayout.SOUTH);
 
         mainPanel.add(panelModel, java.awt.BorderLayout.CENTER);
 
@@ -108,9 +129,10 @@ public class SimplexGUI extends javax.swing.JFrame {
 
         jScrollPane2.setPreferredSize(new java.awt.Dimension(300, 300));
 
-        messageLog.setBackground(new java.awt.Color(1, 1, 1));
+        messageLog.setEditable(false);
+        messageLog.setBackground(new java.awt.Color(254, 254, 254));
         messageLog.setColumns(20);
-        messageLog.setForeground(new java.awt.Color(1, 209, 18));
+        messageLog.setForeground(new java.awt.Color(1, 178, 209));
         messageLog.setRows(5);
         messageLog.setText("Solver Simplex version 1.0");
         messageLog.setToolTipText("");
@@ -154,16 +176,39 @@ public class SimplexGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void captureModelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_captureModelMouseClicked
-        ComputerVision computerVision = new ComputerVision();
-        //computerVision.captureModel();
+        //ComputerVision computerVision = new ComputerVision();
         
-        //this.imagen.setText("reload");
-        //this.imagen.add(new ImageIcon( computerVision.captureModel() ));
-        this.imagen.setIcon( new ImageIcon( computerVision.captureModel() ) );
+        //this.imagen.setIcon( new ImageIcon( computerVision.captureModel() ) );
+        
+        //computerVision.start();
+        
+        
+        latch = new CountDownLatch(1);
+        executor = Executors.newFixedThreadPool(1);
+        computerVision = new ComputerVision(latch);
+        executor.submit( computerVision );
+        
+        progressBarProcesingModel.setValue(10);
+        
+        try {
+            progressBarProcesingModel.setValue(20);
+            latch.await();  // wait until latch counted down to 0
+            progressBarProcesingModel.setValue(80);
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+        this.imagen.setIcon( new ImageIcon( computerVision.getImage() ) );
+        progressBarProcesingModel.setValue(100);
+
         revalidate();
         repaint();
     }//GEN-LAST:event_captureModelMouseClicked
 
+    
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -207,6 +252,7 @@ public class SimplexGUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel labelTitleModel;
     private javax.swing.JButton loadModel;
@@ -217,10 +263,15 @@ public class SimplexGUI extends javax.swing.JFrame {
     private javax.swing.JMenu menuGuide;
     private javax.swing.JTextArea messageLog;
     private javax.swing.JPanel panelButtonModel;
+    private javax.swing.JPanel panelImage;
     private javax.swing.JPanel panelMessage;
     private javax.swing.JPanel panelModel;
     private javax.swing.JPanel panelSolver;
+    private javax.swing.JProgressBar progressBarProcesingModel;
     private javax.swing.JProgressBar progressBarSolver;
-    private javax.swing.JScrollPane scrollModel;
     // End of variables declaration//GEN-END:variables
+
+    private ComputerVision computerVision;
+    private CountDownLatch latch;
+    private ExecutorService executor;
 }
