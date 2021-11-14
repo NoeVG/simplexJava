@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import noevg.github.io.simplex.computerVision.ComputerVision;
 
 /**
@@ -63,7 +64,7 @@ public class SimplexGUI extends javax.swing.JFrame {
         menuAbout = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(500, 700));
+        setMinimumSize(new java.awt.Dimension(700, 850));
         setPreferredSize(new java.awt.Dimension(700, 700));
         setSize(new java.awt.Dimension(500, 500));
 
@@ -194,13 +195,18 @@ public class SimplexGUI extends javax.swing.JFrame {
         latch = new CountDownLatch(1);
         executor = Executors.newFixedThreadPool(1);
         computerVision = new ComputerVision(latch);
+        
         computerVision.setOriginModel(ComputerVision.GET_FROM_FILE);     
+        
         JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & PNG", "jpg", "png");
+        
         int seleccion = fileChooser.showOpenDialog(this);
         if (seleccion == JFileChooser.APPROVE_OPTION){
             computerVision.setPathFileModel(fileChooser.getSelectedFile().getPath());
             loadModel();
         }
+        
     }//GEN-LAST:event_loadModelMouseClicked
     
     private void loadModel(){
